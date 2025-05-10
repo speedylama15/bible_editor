@@ -2,11 +2,11 @@ import { useEffect } from "react";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { $getNodeByKey, COMMAND_PRIORITY_EDITOR, createCommand } from "lexical";
 
-const DATA_ATTRIBUTE_COMMAND = createCommand("DATA_ATTRIBUTE_COMMAND");
+export const DATA_ATTRIBUTE_COMMAND = createCommand("DATA_ATTRIBUTE_COMMAND");
 
 // REVIEW: this command is used for setting indentation value
 // IDEA: maybe I can make this more extensible
-const useDataAttributeCommand = () => {
+export const useDataAttributeCommand = () => {
   const [editor] = useLexicalComposerContext();
 
   useEffect(() => {

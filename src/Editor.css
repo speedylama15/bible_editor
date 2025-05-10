@@ -6,6 +6,8 @@
 
 .editor {
   height: 70rem;
+  /* FIX: remove this later */
+  background-color: #111213;
 }
 
 .editor:focus {

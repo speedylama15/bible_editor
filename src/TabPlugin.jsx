@@ -1,58 +1,86 @@
 import { useEffect } from "react";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import {
-  $getNodeByKey,
   $getSelection,
   $isParagraphNode,
   $isTextNode,
-  COMMAND_PRIORITY_EDITOR,
   COMMAND_PRIORITY_HIGH,
-  createCommand,
   INDENT_CONTENT_COMMAND,
   KEY_TAB_COMMAND,
   OUTDENT_CONTENT_COMMAND,
 } from "lexical";
 
+import {
+  DATA_ATTRIBUTE_COMMAND,
+  useDataAttributeCommand,
+} from "./useDataAttributeCommand";
+
 const TabPlugin = () => {
   const [editor] = useLexicalComposerContext();
+
+  useDataAttributeCommand();
 
   useEffect(() => {
     return editor.registerCommand(
       KEY_TAB_COMMAND,
       (e) => {
-        editor.update(() => {
-          e.preventDefault();
+        e.preventDefault();
 
-          const selection = $getSelection();
-          const anchorNode = selection.anchor.getNode();
-          const parentNode = $isTextNode(anchorNode)
-            ? anchorNode.getParent()
-            : anchorNode;
+        // IDEA: use this variable
+        // let canPressTab = false;
+        const selection = $getSelection();
+        const anchorNode = selection.anchor.getNode();
+        const parentNode = $isTextNode(anchorNode)
+          ? anchorNode.getParent()
+          : anchorNode;
 
-          if ($isParagraphNode(parentNode)) {
-            const currentParentIndent = parentNode.getIndent();
-            const updatedParentIndent = currentParentIndent + 1;
+        // TODO: deal with how indentation works with Paragraph node
+        if ($isParagraphNode(parentNode)) {
+          const currentParentIndent = parentNode.getIndent();
+          const incrementedParentIndent = currentParentIndent + 1;
+          const decrementedParentIndent = currentParentIndent - 1;
 
-            editor.dispatchCommand(DATA_ATTRIBUTE_COMMAND, {
-              key: parentNode.getKey(),
-              attributeValue: updatedParentIndent,
-            });
-
-            parentNode.setIndent(updatedParentIndent);
-
-            return true;
-          }
+          if (incrementedParentIndent > 5) return true;
 
           if (e.shiftKey) {
-            editor.dispatchCommand(OUTDENT_CONTENT_COMMAND);
+            editor.update(() => {
+              editor.dispatchCommand(DATA_ATTRIBUTE_COMMAND, {
+                key: parentNode.getKey(),
+                attributeValue: decrementedParentIndent,
+              });
+
+              parentNode.setIndent(decrementedParentIndent);
+            });
 
             return true;
           } else {
-            editor.dispatchCommand(INDENT_CONTENT_COMMAND);
+            editor.update(() => {
+              editor.dispatchCommand(DATA_ATTRIBUTE_COMMAND, {
+                key: parentNode.getKey(),
+                attributeValue: incrementedParentIndent,
+              });
+
+              parentNode.setIndent(incrementedParentIndent);
+            });
 
             return true;
           }
-        });
+        }
+
+        if (e.shiftKey) {
+          // REVIEW: no need to return true or false within an editor.update() method
+          editor.update(() => {
+            editor.dispatchCommand(OUTDENT_CONTENT_COMMAND);
+          });
+
+          return true;
+        } else {
+          editor.update(() => {
+            editor.dispatchCommand(INDENT_CONTENT_COMMAND);
+          });
+
+          return true;
+        }
       },
       COMMAND_PRIORITY_HIGH
     );
