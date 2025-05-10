@@ -1,0 +1,19 @@
+.editor_container {
+  position: relative;
+  width: 70rem;
+  margin: 10rem auto auto auto;
+}
+
+.editor {
+  height: 70rem;
+}
+
+.editor:focus {
+  outline: none;
+}
+
+.editor_placeholder {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
