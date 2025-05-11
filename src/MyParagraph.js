@@ -1,5 +1,6 @@
 import { ParagraphNode } from "lexical";
 
+// FIX: importJSON, exportJSON, importDOM and more
 class MyParagraph extends ParagraphNode {
   constructor(key) {
     super(key);

@@ -40,27 +40,27 @@ div,
 
 [data-indent="1"],
 [data-custom-indent="1"] {
-  padding-inline-start: 16px !important;
+  padding-inline-start: 32px !important;
 }
 
 [data-indent="2"],
 [data-custom-indent="2"] {
-  padding-inline-start: 32px !important;
+  padding-inline-start: 64px !important;
 }
 
 [data-indent="3"],
 [data-custom-indent="3"] {
-  padding-inline-start: 48px !important;
+  padding-inline-start: 96px !important;
 }
 
 [data-indent="4"],
 [data-custom-indent="4"] {
-  padding-inline-start: 64px !important;
+  padding-inline-start: 128px !important;
 }
 
 [data-indent="5"],
 [data-custom-indent="5"] {
-  padding-inline-start: 80px !important;
+  padding-inline-start: 160px !important;
 }
 
 .editor_paragraph,
@@ -80,11 +80,11 @@ div,
 }
 
 .editor_listItem {
-  margin-left: 20px;
+  margin-left: 28px;
 }
 
 .editor_listItem > span {
-  margin-left: 3px;
+  margin-left: 4px;
 }
 
 .editor_listItem::marker {

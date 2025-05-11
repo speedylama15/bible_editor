@@ -9,6 +9,8 @@ import {
 } from "lexical";
 import { $createListItemNode, $createListNode } from "@lexical/list";
 
+import { getSelectionData } from "./utils/getSelectionData";
+
 const SpacePlugin = () => {
   const [editor] = useLexicalComposerContext();
 
@@ -17,23 +19,21 @@ const SpacePlugin = () => {
       KEY_SPACE_COMMAND,
       (e) => {
         const selection = $getSelection();
-        const anchor = selection.anchor;
-        const anchorOffset = anchor.offset;
-        const anchorNode = anchor.getNode();
-        const textContent = anchorNode.getTextContent();
+
+        const { anchorOffset, parentNode, textContent } =
+          getSelectionData(selection);
 
         if (
           textContent[0] === "-" &&
           anchorOffset === 1 &&
-          $isParagraphNode(anchorNode.getParent())
+          $isParagraphNode(parentNode)
         ) {
           editor.update(() => {
             e.preventDefault();
 
-            const paragraphNode = anchorNode.getParent();
+            if (!$isParagraphNode(parentNode)) return false;
 
-            if (!$isParagraphNode(paragraphNode)) return false;
-
+            const currentIndent = parentNode.getIndent();
             const listNode = $createListNode("bullet");
             const listItemNode = $createListItemNode();
             const textNode = $createTextNode();
@@ -42,7 +42,8 @@ const SpacePlugin = () => {
             listNode.append(listItemNode);
             listItemNode.append(textNode);
 
-            paragraphNode.replace(listNode);
+            parentNode.replace(listNode);
+            listItemNode.setIndent(currentIndent);
             textNode.select(0, 0);
 
             return true;

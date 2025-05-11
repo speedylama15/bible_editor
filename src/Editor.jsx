@@ -8,6 +8,7 @@ import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import TabPlugin from "./TabPlugin";
 import SpacePlugin from "./SpacePlugin";
 import EnterPlugin from "./EnterPlugin";
+import BackspacePlugin from "./BackspacePlugin";
 
 import "./Editor.css";
 
@@ -28,6 +29,7 @@ const Editor = ({ config }) => {
           ErrorBoundary={LexicalErrorBoundary}
         />
 
+        <BackspacePlugin />
         <TabPlugin />
         <SpacePlugin />
         <EnterPlugin />
