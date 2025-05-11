@@ -34,7 +34,7 @@ function App() {
       {
         replace: ParagraphNode,
         with: () => {
-          return new MyParagraph(0);
+          return new MyParagraph();
         },
         withKlass: MyParagraph,
       },

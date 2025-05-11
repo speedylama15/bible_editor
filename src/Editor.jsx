@@ -7,6 +7,7 @@ import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 
 import TabPlugin from "./TabPlugin";
 import SpacePlugin from "./SpacePlugin";
+import EnterPlugin from "./EnterPlugin";
 
 import "./Editor.css";
 
@@ -29,6 +30,7 @@ const Editor = ({ config }) => {
 
         <TabPlugin />
         <SpacePlugin />
+        <EnterPlugin />
 
         {/* IDEA: we can use DOM events in Lexical */}
 

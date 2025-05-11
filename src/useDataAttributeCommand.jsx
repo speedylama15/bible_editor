@@ -4,6 +4,7 @@ import { $getNodeByKey, COMMAND_PRIORITY_EDITOR, createCommand } from "lexical";
 
 export const DATA_ATTRIBUTE_COMMAND = createCommand("DATA_ATTRIBUTE_COMMAND");
 
+// FIX: I'll keep this just in case
 // REVIEW: this command is used for setting indentation value
 // IDEA: maybe I can make this more extensible
 export const useDataAttributeCommand = () => {

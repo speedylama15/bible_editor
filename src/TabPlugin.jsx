@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import {
   $getSelection,
+  $getSiblingCaret,
   $isParagraphNode,
   $isTextNode,
   COMMAND_PRIORITY_HIGH,
@@ -9,16 +10,10 @@ import {
   KEY_TAB_COMMAND,
   OUTDENT_CONTENT_COMMAND,
 } from "lexical";
-
-import {
-  DATA_ATTRIBUTE_COMMAND,
-  useDataAttributeCommand,
-} from "./useDataAttributeCommand";
+import { $isListItemNode } from "@lexical/list";
 
 const TabPlugin = () => {
   const [editor] = useLexicalComposerContext();
-
-  useDataAttributeCommand();
 
   useEffect(() => {
     return editor.registerCommand(
@@ -26,60 +21,80 @@ const TabPlugin = () => {
       (e) => {
         e.preventDefault();
 
-        // IDEA: use this variable
-        // let canPressTab = false;
+        let canPressTab = false;
         const selection = $getSelection();
         const anchorNode = selection.anchor.getNode();
         const parentNode = $isTextNode(anchorNode)
           ? anchorNode.getParent()
           : anchorNode;
+        const prevSiblingNode = $getSiblingCaret(
+          parentNode,
+          "previous"
+        )?.getNodeAtCaret();
 
         // TODO: deal with how indentation works with Paragraph node
         if ($isParagraphNode(parentNode)) {
           const currentParentIndent = parentNode.getIndent();
           const incrementedParentIndent = currentParentIndent + 1;
-          const decrementedParentIndent = currentParentIndent - 1;
-
-          if (incrementedParentIndent > 5) return true;
 
           if (e.shiftKey) {
             editor.update(() => {
-              editor.dispatchCommand(DATA_ATTRIBUTE_COMMAND, {
-                key: parentNode.getKey(),
-                attributeValue: decrementedParentIndent,
-              });
-
-              parentNode.setIndent(decrementedParentIndent);
+              editor.dispatchCommand(OUTDENT_CONTENT_COMMAND);
             });
 
             return true;
-          } else {
-            editor.update(() => {
-              editor.dispatchCommand(DATA_ATTRIBUTE_COMMAND, {
-                key: parentNode.getKey(),
-                attributeValue: incrementedParentIndent,
-              });
+          }
 
-              parentNode.setIndent(incrementedParentIndent);
+          // IDEA: this logic will most likely have to fixed
+          if (
+            prevSiblingNode &&
+            prevSiblingNode.getIndent() >= parentNode.getIndent()
+          ) {
+            canPressTab = true;
+          }
+
+          if (canPressTab) {
+            if (incrementedParentIndent > 5) return true;
+
+            // REVIEW: editor.update() does not need to return a boolean
+            editor.update(() => {
+              editor.dispatchCommand(INDENT_CONTENT_COMMAND);
             });
 
             return true;
           }
         }
 
-        if (e.shiftKey) {
-          // REVIEW: no need to return true or false within an editor.update() method
-          editor.update(() => {
-            editor.dispatchCommand(OUTDENT_CONTENT_COMMAND);
-          });
+        // IDEA: the logic is identical
+        // IDEA: we'll have to see if the logic needs any change
+        if ($isListItemNode(parentNode)) {
+          const currentParentIndent = parentNode.getIndent();
+          const incrementedParentIndent = currentParentIndent + 1;
 
-          return true;
-        } else {
-          editor.update(() => {
-            editor.dispatchCommand(INDENT_CONTENT_COMMAND);
-          });
+          if (e.shiftKey) {
+            editor.update(() => {
+              editor.dispatchCommand(OUTDENT_CONTENT_COMMAND);
+            });
 
-          return true;
+            return true;
+          }
+
+          if (
+            prevSiblingNode &&
+            prevSiblingNode.getIndent() >= parentNode.getIndent()
+          ) {
+            canPressTab = true;
+          }
+
+          if (canPressTab) {
+            if (incrementedParentIndent > 5) return true;
+
+            editor.update(() => {
+              editor.dispatchCommand(INDENT_CONTENT_COMMAND);
+            });
+
+            return true;
+          }
         }
       },
       COMMAND_PRIORITY_HIGH
