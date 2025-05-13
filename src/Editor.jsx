@@ -9,6 +9,7 @@ import TabPlugin from "./TabPlugin";
 import SpacePlugin from "./SpacePlugin";
 import EnterPlugin from "./EnterPlugin";
 import BackspacePlugin from "./BackspacePlugin";
+import MyListPlugin from "./plugins/MyListPlugin/MyListPlugin";
 
 import "./Editor.css";
 
@@ -29,10 +30,7 @@ const Editor = ({ config }) => {
           ErrorBoundary={LexicalErrorBoundary}
         />
 
-        <BackspacePlugin />
-        <TabPlugin />
-        <SpacePlugin />
-        <EnterPlugin />
+        <MyListPlugin />
 
         {/* IDEA: we can use DOM events in Lexical */}
 
