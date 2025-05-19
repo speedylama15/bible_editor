@@ -1,7 +1,14 @@
+.app {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 70rem;
+  margin: 15rem auto auto auto;
+}
+
 .editor_container {
   position: relative;
-  width: 70rem;
-  margin: 10rem auto auto auto;
+  width: 100%;
 }
 
 .editor {

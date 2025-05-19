@@ -5,6 +5,7 @@ import Editor from "./Editor";
 import MyParagraph from "./MyParagraph";
 
 import "./App.css";
+import TestButtons from "./components/TestButtons";
 
 const theme = {
   paragraph: "editor_paragraph",

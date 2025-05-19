@@ -1,0 +1,13 @@
+.testButtons {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.testButtons > button {
+  font-size: 1.6rem;
+  padding: 1.2rem 1.6rem;
+  border-radius: 0.5rem;
+  border: none;
+  outline: none;
+}

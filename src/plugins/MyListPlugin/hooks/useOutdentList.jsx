@@ -1,14 +1,10 @@
 import { useEffect } from "react";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import {
-  $getSelection,
-  $getSiblingCaret,
   COMMAND_PRIORITY_HIGH,
   KEY_TAB_COMMAND,
+  OUTDENT_CONTENT_COMMAND,
 } from "lexical";
-import { $isListItemNode } from "@lexical/list";
-
-import { getSelectionData } from "../../../utils/getSelectionData";
 
 const useOutdentList = () => {
   const [editor] = useLexicalComposerContext();
@@ -19,22 +15,13 @@ const useOutdentList = () => {
       (e) => {
         e.preventDefault();
 
-        const selection = $getSelection();
+        if (!e.shiftKey) return false;
 
-        const { parentNode } = getSelectionData(selection);
+        editor.update(() => {
+          editor.dispatchCommand(OUTDENT_CONTENT_COMMAND, undefined);
+        });
 
-        if (e.shiftKey && $isListItemNode(parentNode)) {
-          // FIX
-          console.log($getSiblingCaret(parentNode, "next")?.getNodeAtCaret());
-          console.log(
-            $getSiblingCaret(parentNode, "next")
-              ?.getAdjacentCaret()
-              ?.getNodeAtCaret()
-          );
-          return true;
-        } else {
-          return false;
-        }
+        return true;
       },
       COMMAND_PRIORITY_HIGH
     );

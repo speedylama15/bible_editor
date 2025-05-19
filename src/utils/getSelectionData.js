@@ -1,10 +1,10 @@
-import { $isRangeSelection, $isTextNode } from "lexical";
+import { $getSelection, $isRangeSelection, $isTextNode } from "lexical";
 
-export const getSelectionData = (selection) => {
+export const getSelectionData = () => {
+  const selection = $getSelection();
+
   if (!$isRangeSelection(selection)) return false;
-
-  // FIX
-  // if (!selection.isCollapsed()) return false;
+  if (!selection.isCollapsed()) return false;
 
   const anchorNode = selection.anchor.getNode();
   const anchor = selection.anchor;
@@ -14,6 +14,16 @@ export const getSelectionData = (selection) => {
     ? anchorNode.getParent()
     : anchorNode;
   const textContent = parentNode.getTextContent();
+  const grandparentNode = parentNode?.getParent();
 
-  return { anchor, focus, anchorNode, anchorOffset, parentNode, textContent };
+  return {
+    selection,
+    anchor,
+    focus,
+    anchorNode,
+    anchorOffset,
+    parentNode,
+    textContent,
+    grandparentNode,
+  };
 };

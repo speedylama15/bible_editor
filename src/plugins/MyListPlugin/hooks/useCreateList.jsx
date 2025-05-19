@@ -20,36 +20,64 @@ const useCreateList = () => {
       (e) => {
         const selection = $getSelection();
 
-        // REVIEW: checkup
-        const { anchorOffset, parentNode, textContent } =
-          getSelectionData(selection);
+        const {
+          anchorOffset,
+          parentNode: paragraphNode,
+          textContent,
+        } = getSelectionData(selection);
+
+        if (!$isParagraphNode(paragraphNode)) return false;
 
         if (
           textContent[0] === "-" &&
           anchorOffset === 1 &&
-          $isParagraphNode(parentNode)
+          $isParagraphNode(paragraphNode)
         ) {
           e.preventDefault();
 
-          if (!$isParagraphNode(parentNode)) return false;
-
-          // REVIEW: this is the only case where a bullet list will get created via typing
           editor.update(() => {
-            // IDEA: this whole section within this block may be recycled for other types of list
-            const currentIndent = parentNode.getIndent();
+            const currentIndent = paragraphNode.getIndent();
             const listNode = $createListNode("bullet");
             const listItemNode = $createListItemNode();
-            const textNode = $createTextNode();
+            const textNode = $createTextNode(textContent.substring(1));
 
-            // REVIEW: persist the text
-            textNode.setTextContent(textContent.substring(1));
-            listNode.append(listItemNode);
             listItemNode.append(textNode);
+            listNode.append(listItemNode);
 
-            parentNode.replace(listNode);
-            // REVIEW: indent
+            paragraphNode.replace(listNode);
             listItemNode.setIndent(currentIndent);
-            // REVIEW: selection must be maintained
+            textNode.select(0, 0);
+          });
+
+          return true;
+        }
+
+        const textContentBeforeCaret = textContent.substring(0, anchorOffset);
+        const canCreateNumberedList =
+          textContentBeforeCaret.match(/^(\d+)\.(\s*)$/);
+
+        if (canCreateNumberedList) {
+          e.preventDefault();
+
+          const textBeforeCaret = canCreateNumberedList[0];
+
+          editor.update(() => {
+            const currentIndent = paragraphNode.getIndent();
+            const listNode = $createListNode(
+              "number",
+              parseInt(textBeforeCaret)
+            );
+            const listItemNode = $createListItemNode();
+            const textNode = $createTextNode(
+              textContent.substring(textBeforeCaret.length)
+            );
+
+            listItemNode.append(textNode);
+            listNode.append(listItemNode);
+
+            // IDEA: questionable
+            paragraphNode.replace(listNode);
+            listItemNode.setIndent(currentIndent);
             textNode.select(0, 0);
           });
 

@@ -5,40 +5,43 @@ import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 
-import TabPlugin from "./TabPlugin";
-import SpacePlugin from "./SpacePlugin";
-import EnterPlugin from "./EnterPlugin";
-import BackspacePlugin from "./BackspacePlugin";
 import MyListPlugin from "./plugins/MyListPlugin/MyListPlugin";
 
 import "./Editor.css";
+import TestButtons from "./components/TestButtons";
 
 const Editor = ({ config }) => {
   return (
-    <div className="editor_container">
+    <>
       <LexicalComposer initialConfig={config}>
-        <RichTextPlugin
-          contentEditable={
-            <ContentEditable
-              className="editor"
-              aria-placeholder={"Enter some text..."}
-              placeholder={
-                <div className="editor_placeholder">Enter some text...</div>
+        <div className="app">
+          <TestButtons />
+
+          <div className="editor_container">
+            <RichTextPlugin
+              contentEditable={
+                <ContentEditable
+                  className="editor"
+                  aria-placeholder={"Enter some text..."}
+                  placeholder={
+                    <div className="editor_placeholder">Enter some text...</div>
+                  }
+                />
               }
+              ErrorBoundary={LexicalErrorBoundary}
             />
-          }
-          ErrorBoundary={LexicalErrorBoundary}
-        />
 
-        <MyListPlugin />
+            <MyListPlugin />
 
-        {/* IDEA: we can use DOM events in Lexical */}
+            {/* IDEA: we can use DOM events in Lexical */}
 
-        <HistoryPlugin />
+            <HistoryPlugin />
 
-        <AutoFocusPlugin />
+            <AutoFocusPlugin />
+          </div>
+        </div>
       </LexicalComposer>
-    </div>
+    </>
   );
 };
 

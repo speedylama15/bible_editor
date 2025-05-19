@@ -1,15 +1,14 @@
 import { useEffect } from "react";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import {
-  $getSelection,
   $getSiblingCaret,
   COMMAND_PRIORITY_HIGH,
   INDENT_CONTENT_COMMAND,
   KEY_TAB_COMMAND,
 } from "lexical";
-import { $isListItemNode } from "@lexical/list";
 
 import { getSelectionData } from "../../../utils/getSelectionData";
+import { getListItemNodeIndex } from "../../../utils/getListItemNodeIndex";
 
 const useIndentList = () => {
   const [editor] = useLexicalComposerContext();
@@ -20,45 +19,27 @@ const useIndentList = () => {
       (e) => {
         e.preventDefault();
 
-        // IDEA: this only handles indent, end this and return false
         if (e.shiftKey) return false;
 
         let canPressTab = false;
-        const selection = $getSelection();
 
-        // REVIEW: must be listItem
-        const { parentNode } = getSelectionData(selection);
+        const { parentNode: listItemNode, grandparentNode: listNode } =
+          getSelectionData();
 
-        const prevSiblingNode = $getSiblingCaret(
-          parentNode,
-          "previous"
-        )?.getNodeAtCaret();
+        const listItemNodeIndex = getListItemNodeIndex(listNode, listItemNode);
+        const origin = listItemNodeIndex === 0 ? listNode : listItemNode;
+        const prevSiblingCaret = $getSiblingCaret(origin, "previous");
+        const prevSiblingNode = prevSiblingCaret.getNodeAtCaret();
 
-        // FIX
-        console.log("BULLET LIST INDENT", prevSiblingNode?.getType());
+        if (prevSiblingNode) canPressTab = true;
 
-        if ($isListItemNode(parentNode)) {
-          const currentParentIndent = parentNode.getIndent();
-          const incrementedParentIndent = currentParentIndent + 1;
-
-          if (
-            prevSiblingNode &&
-            prevSiblingNode.getIndent() >= parentNode.getIndent()
-          ) {
-            canPressTab = true;
-          }
-
-          if (canPressTab) {
-            // REVIEW: maximum indentation
-            if (incrementedParentIndent > 5) return true;
-
-            editor.update(() => {
-              editor.dispatchCommand(INDENT_CONTENT_COMMAND);
-            });
-
-            return true;
-          }
+        if (canPressTab) {
+          editor.update(() => {
+            editor.dispatchCommand(INDENT_CONTENT_COMMAND, undefined);
+          });
         }
+
+        return true;
       },
       COMMAND_PRIORITY_HIGH
     );
@@ -68,36 +49,3 @@ const useIndentList = () => {
 };
 
 export default useIndentList;
-
-// // TODO: deal with how indentation works with Paragraph node
-// if ($isParagraphNode(parentNode)) {
-//   const currentParentIndent = parentNode.getIndent();
-//   const incrementedParentIndent = currentParentIndent + 1;
-
-//   if (e.shiftKey) {
-//     editor.update(() => {
-//       editor.dispatchCommand(OUTDENT_CONTENT_COMMAND);
-//     });
-
-//     return true;
-//   }
-
-//   // IDEA: this logic will most likely have to fixed
-//   if (
-//     prevSiblingNode &&
-//     prevSiblingNode.getIndent() >= parentNode.getIndent()
-//   ) {
-//     canPressTab = true;
-//   }
-
-//   if (canPressTab) {
-//     if (incrementedParentIndent > 5) return true;
-
-//     // REVIEW: editor.update() does not need to return a boolean
-//     editor.update(() => {
-//       editor.dispatchCommand(INDENT_CONTENT_COMMAND);
-//     });
-
-//     return true;
-//   }
-// }
