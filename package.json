@@ -10,9 +10,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@lexical/list": "^0.31.0",
-    "@lexical/react": "^0.31.0",
-    "lexical": "^0.31.0",
+    "@lexical/list": "^0.31.1",
+    "@lexical/react": "^0.31.1",
+    "lexical": "^0.31.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
   },

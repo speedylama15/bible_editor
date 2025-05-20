@@ -6,9 +6,10 @@ import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 
 import MyListPlugin from "./plugins/MyListPlugin/MyListPlugin";
+import MyParagraphPlugin from "./plugins/MyParagraphPlugin/MyParagraphPlugin";
+import TestButtons from "./components/TestButtons";
 
 import "./Editor.css";
-import TestButtons from "./components/TestButtons";
 
 const Editor = ({ config }) => {
   return (
@@ -32,6 +33,7 @@ const Editor = ({ config }) => {
             />
 
             <MyListPlugin />
+            <MyParagraphPlugin />
 
             {/* IDEA: we can use DOM events in Lexical */}
 

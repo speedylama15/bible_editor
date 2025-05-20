@@ -9,6 +9,7 @@ import {
 
 import { getSelectionData } from "../../../utils/getSelectionData";
 import { getListItemNodeIndex } from "../../../utils/getListItemNodeIndex";
+import { $isListItemNode } from "@lexical/list";
 
 const useIndentList = () => {
   const [editor] = useLexicalComposerContext();
@@ -21,22 +22,29 @@ const useIndentList = () => {
 
         if (e.shiftKey) return false;
 
-        let canPressTab = false;
-
         const { parentNode: listItemNode, grandparentNode: listNode } =
           getSelectionData();
+
+        if (!$isListItemNode(listItemNode)) return false;
 
         const listItemNodeIndex = getListItemNodeIndex(listNode, listItemNode);
         const origin = listItemNodeIndex === 0 ? listNode : listItemNode;
         const prevSiblingCaret = $getSiblingCaret(origin, "previous");
         const prevSiblingNode = prevSiblingCaret.getNodeAtCaret();
+        const prevSiblingNodeIndent = prevSiblingNode?.getIndent();
 
-        if (prevSiblingNode) canPressTab = true;
+        console.log(prevSiblingNodeIndent);
 
-        if (canPressTab) {
+        if (
+          prevSiblingNode &&
+          prevSiblingNodeIndent < 5 &&
+          prevSiblingNodeIndent >= listItemNode.getIndent()
+        ) {
           editor.update(() => {
             editor.dispatchCommand(INDENT_CONTENT_COMMAND, undefined);
           });
+        } else {
+          return false;
         }
 
         return true;

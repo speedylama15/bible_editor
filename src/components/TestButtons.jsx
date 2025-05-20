@@ -1,9 +1,9 @@
-import { useEffect } from "react";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 
 import "./TestButtons.css";
 import {
   $createTextNode,
+  $getRoot,
   $getSelection,
   $isRangeSelection,
   $isTextNode,
@@ -14,11 +14,11 @@ import {
   $isListItemNode,
   $isListNode,
 } from "@lexical/list";
+import { getTopListNode } from "../utils/getTopListNode";
+import { getSelectionData } from "../utils/getSelectionData";
 
 const TestButtons = () => {
   const [editor] = useLexicalComposerContext();
-
-  useEffect(() => {}, [editor]);
 
   const handleGetMetadata = () => {
     editor.read(() => {
@@ -61,9 +61,7 @@ const TestButtons = () => {
         ? anchorNode.getParent()
         : anchorNode;
 
-      if ($isListItemNode(parentNode)) {
-        console.log(parentNode.getIndent());
-      }
+      console.log(parentNode.getIndent());
     });
   };
 
@@ -146,6 +144,19 @@ const TestButtons = () => {
     });
   };
 
+  const handleListItemIndex = () => {
+    editor.read(() => {
+      const selection = $getSelection();
+      const anchorNode = selection.anchor.getNode();
+      const listItemNode = $isTextNode(anchorNode)
+        ? anchorNode.getParent()
+        : anchorNode;
+      const topListNode = getTopListNode(listItemNode);
+
+      console.log(listItemNode.getIndexWithinParent());
+    });
+  };
+
   return (
     <div className="testButtons">
       <button onClick={handleGetMetadata}>Get Metadata</button>
@@ -158,6 +169,60 @@ const TestButtons = () => {
 
       <button onClick={handleChangingListType}>
         Handle Changing List Type
+      </button>
+
+      <button
+        onClick={() => {
+          editor.read(() => {
+            const { parentNode } = getSelectionData();
+
+            console.log("RESULT", getTopListNode(parentNode));
+          });
+        }}
+      >
+        Get Top List Node
+      </button>
+
+      <button
+        onClick={() => {
+          editor.read(() => {
+            const { parentNode } = getSelectionData();
+
+            const topListNode = getTopListNode(parentNode);
+
+            console.log(
+              "Getting top list node's children",
+              topListNode.getChildren()
+            );
+          });
+        }}
+      >
+        Get List Children
+      </button>
+
+      <button
+        onClick={() => {
+          editor.update(() => {
+            const { parentNode } = getSelectionData();
+
+            const topListNode = getTopListNode(parentNode);
+
+            const element = topListNode.getChildren()[0];
+
+            console.log(element);
+
+            const root = $getRoot();
+            const firstChildOfRoot = root.getChildAtIndex(0);
+
+            firstChildOfRoot.insertAfter(topListNode);
+          });
+        }}
+      >
+        Append all nested elements to a paragraph
+      </button>
+
+      <button onClick={handleListItemIndex}>
+        Get index of a list item within a list
       </button>
     </div>
   );
